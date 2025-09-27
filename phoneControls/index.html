@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Yealink Call Dashboard</title>
+  <link rel="icon" type="image/png" href="/resources/favicon.png">
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 95vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #1e1e1e;
+      color: #e0e0e0;
+    }
+
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 16px;
+      width: 220px;
+      border-radius: 6px;
+      border: 1px solid #555;
+      background-color: #2c2c2c;
+      color: #e0e0e0;
+      margin-bottom: 16px;
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #888;
+      background-color: #333;
+    }
+
+    button {
+      padding: 6px 12px;
+      font-size: 14px;
+      margin: 6px;
+      cursor: pointer;
+      background-color: #2c2c2c;
+      color: #e0e0e0;
+      border: 1px solid #444;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #3a3a3a;
+    }
+
+    .icon-button {
+      display: inline-block;
+      width: 96px;
+      height: 96px;
+      margin: 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      transition: transform 0.1s ease, filter 0.1s ease;
+    }
+
+    .icon-button:hover {
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
+
+    .icon-button img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #status {
+      margin-top: 12px;
+      font-weight: bold;
+      color: #90ee90;
+    }
+
+    .dnd-toggle {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .dnd-label {
+      font-size: 14px;
+      color: #ccc;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #444;
+      transition: 0.3s;
+      border-radius: 24px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: #eee;
+      transition: 0.3s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #007acc;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    .table-wrapper {
+      flex-grow: 1;
+      overflow-y: scroll;
+      border: 1px solid #444;
+      border-radius: 4px;
+      margin-top: 20px;
+      max-height: 25vh;
+    }
+
+    .table-wrapper::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+      background: #1e1e1e;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+      background-color: #555;
+      border-radius: 4px;
+      border: 2px solid #1e1e1e;
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb:hover {
+      background-color: #777;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+    }
+
+    th, td {
+      border: 1px solid #444;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #333;
+    }
+
+    tr:hover td {
+      background-color: #3a3a3a;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Yealink T46S Control Panel</h2>
+
+    <p id="status"></p>
+
+    <div class="top-row">
+      <div class="call-controls">
+        <input type="text" id="dialInput" placeholder="Enter number to call">
+
+        <div>
+          <button class="icon-button" onclick="toggleMute()">
+            <img src="/resources/mute-icon.png" alt="Mute">
+          </button>
+          <button class="icon-button" onclick="toggleHold()">
+            <img src="/resources/hold-icon.png" alt="Hold">
+          </button>
+          <button class="icon-button" onclick="startCall()">
+            <img src="/resources/answer-icon.png" alt="Call">
+          </button>
+          <button class="icon-button" onclick="rejectCall()">
+            <img src="/resources/reject-icon.png" alt="Reject">
+          </button>
+          <button class="icon-button" onclick="volumeDown()">
+            <img src="/resources/volume-down.png" alt="Volume Down">
+          </button>
+          <button class="icon-button" onclick="volumeUp()">
+          <img src="/resources/volume-up.png" alt="Volume Up">
+          </button>
+        </div>
+      </div>
+
+    <div class="dnd-toggle">
+      <label class="switch">
+        <input type="checkbox" id="dndSwitch" onchange="toggleDND(this.checked)">
+        <span class="slider"></span>
+      </label>
+      <span class="dnd-label">Do Not Disturb</span>
+    </div>
+
+    <h3>Macros</h3>
+    <div id="macro-buttons"></div>
+
+    <h3>Transfer</h3>
+    <div id="transfer-buttons"></div>
+
+    <h3>Call Log</h3>
+    <div class="table-wrapper">
+      <table id="callTable">
+        <thead>
+          <tr><th>Type</th><th>Number</th><th>Name</th><th>Start Time</th><th>Duration</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    let lastCallSnapshot = "";
+
+    const coworkers = [
+      { name: "Sales", blf: "801" },
+      { name: "Support", blf: "802" },
+      { name: "Joe", blf: "174" },
+      { name: "Mike", blf: "172" },
+      { name: "Garret", blf: "173" },
+      { name: "Kahliah", blf: "175" },
+      { name: "Shane", blf: "170" },
+      { name: "Cliff", blf: "180" },
+      { name: "Greyson", blf: "176" },
+      { name: "Kirsten", blf: "182" },
+      { name: "Anthony", blf: "184" },
+      { name: "Javier", blf: "171" },
+      { name: "LJ", blf: "181" },
+      { name: "Geoffrey", blf: "179" },
+      { name: "Clinton", blf: "178" },
+    ];
+
+    const conferenceMacros = [
+      { name: "PAX", sequence: "F_CONFERENCE;8;7;7;8;5;9;0;0;9;9;ENTER" },
+      { name: "Dejavoo", sequence: "F_CONFERENCE;8;7;7;3;5;8;6;7;9;7;ENTER" }
+    ];
+
+    function startCall() {
+      const inputField = document.getElementById("dialInput");
+      const rawInput = inputField.value.trim();
+      const number = sanitizeNumber(rawInput);
+
+      if (number.length === 10) {
+        fetch(`/call?target=${encodeURIComponent(number)}`)
+          .then(r => r.text())
+          .then(msg => {
+            updateStatus(msg);
+            if (msg.toLowerCase().includes("calling")) {
+              inputField.value = ""; // Clear input only if call was initiated
+            }
+          })
+          .catch(err => {
+            console.error("[CALL] Error:", err);
+            updateStatus("Call failed.");
+          });
+      } else {
+        updateStatus("Please enter a valid 10-digit number.");
+      }
+    }
+
+    function toggleMute() {
+      fetch("/toggle").then(r => r.text()).then(updateStatus);
+    }
+
+    function rejectCall() {
+      fetch("/reject").then(r => r.text()).then(updateStatus);
+    }
+
+    function toggleHold() {
+      fetch("/hold").then(r => r.text()).then(updateStatus);
+    }
+
+    function toggleDND(isOn) {
+      const mode = isOn ? "on" : "off";
+      fetch(`/dnd?mode=${mode}`)
+        .then(r => r.text())
+        .then(updateStatus);
+    }
+
+    function volumeUp() {
+      fetch("/volume?direction=up")
+        .then(r => r.text())
+        .then(updateStatus);
+    }
+
+    function volumeDown() {
+      fetch("/volume?direction=down")
+        .then(r => r.text())
+        .then(updateStatus);
+    }
+
+    function transferTo(blfValue) {
+      fetch(`/transfer?target=${encodeURIComponent(blfValue)}`)
+        .then(r => r.text())
+        .then(updateStatus);
+    }
+
+    function updateStatus(msg) {
+      console.log("[CLIENT] " + msg);
+      document.getElementById("status").innerText = msg;
+    }
+
+    function startConference(sequence) {
+      fetch(`/macro?sequence=${encodeURIComponent(sequence)}`)
+        .then(r => r.text())
+        .then(updateStatus);
+    }
+
+    function createConferenceButtons() {
+      const container = document.getElementById("macro-buttons");
+      conferenceMacros.forEach(({ name, sequence }) => {
+        const btn = document.createElement("button");
+        btn.innerText = name;
+        btn.onclick = () => startConference(sequence);
+        container.appendChild(btn);
+      });
+    }
+
+    function loadCallLog() {
+      fetch("/calls")
+        .then(r => r.json())
+        .then(data => {
+          const latestEpoch = data.reduce((max, c) => Math.max(max, c.start_epoch || 0), 0);
+          const snapshot = `${data.length}-${latestEpoch}`;
+          if (snapshot === lastCallSnapshot) return;
+          lastCallSnapshot = snapshot;
+
+          const tbody = document.querySelector("#callTable tbody");
+          tbody.innerHTML = "";
+          data
+            .sort((a, b) => (b.start_epoch || 0) - (a.start_epoch || 0))
+            .forEach(entry => {
+              const duration = entry.duration ? formatDuration(entry.duration) : "-";
+              const time = entry.start_time || "-";
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${entry.status || "-"}</td>
+                <td>${entry.number || "-"}</td>
+                <td>${entry.name || "-"}</td>
+                <td>${time}</td>
+                <td>${duration}</td>
+              `;
+              tbody.appendChild(row);
+            });
+        })
+        .catch(err => {
+          console.error("[CALL LOG] Failed to load:", err);
+          updateStatus("Failed to load call log.");
+        });
+    }
+
+    function formatDuration(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+    }
+
+    function createTransferButtons() {
+      const container = document.getElementById("transfer-buttons");
+      coworkers.forEach(({ name, blf }) => {
+        const btn = document.createElement("button");
+        btn.innerText = name;
+        btn.onclick = () => transferTo(blf);
+        container.appendChild(btn);
+      });
+    }
+
+    function sanitizeNumber(rawInput) {
+      // Remove all non-digit characters
+      let digits = rawInput.replace(/\D/g, '');
+
+      // If more than 10 digits and starts with '1', drop the first digit
+      if (digits.length > 10 && digits.startsWith('1')) {
+        digits = digits.slice(1);
+      }
+
+      // If still over 10 digits, trim from the end
+      if (digits.length > 10) {
+        digits = digits.slice(0, 10);
+      }
+
+      return digits;
+    }
+
+    function formatDuration(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+    }
+
+    setInterval(loadCallLog, 5000);
+    loadCallLog();
+    createTransferButtons();
+    createConferenceButtons();
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Overlay Controls</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    #overlay-panel {
+      width: 80px;
+      margin: 0;
+      padding: 0;
+      background: rgba(0, 0, 0, 0.2); /* optional debug background */
+      transform: scale(0.6);
+      transform-origin: top left;
+      overflow: hidden;
+      box-sizing: border-box;
+      border-radius: 25px;
+    }
+
+    .icon-button {
+      display: block;
+      width: 48px;
+      height: 48px;
+      margin: 10px 10px;
+      border: none;
+      background: none;
+      cursor: pointer;
+      transition: transform 0.1s ease, filter 0.1s ease;
+    }
+    .icon-button:hover {
+      transform: scale(1.05);
+      filter: brightness(1.1);
+    }
+
+    .icon-button img {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+    }
+
+    #status {
+      font-size: 12px;
+      text-align: center;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay-panel">
+    <button class="icon-button" onclick="toggleMute()">
+      <img src="resources/mute-icon.png" alt="Mute">
+    </button>
+    <button class="icon-button" onclick="toggleHold()">
+      <img src="resources/hold-icon.png" alt="Hold">
+    </button>
+    <button class="icon-button" onclick="answerCall()">
+      <img src="resources/answer-icon.png" alt="Answer">
+    </button>
+    <button class="icon-button" onclick="rejectCall()">
+      <img src="resources/reject-icon.png" alt="Reject">
+    </button>
+    <button class="icon-button" onclick="volumeDown()">
+      <img src="/resources/volume-down.png" alt="Volume Down">
+    </button>
+    <button class="icon-button" onclick="volumeUp()">
+      <img src="/resources/volume-up.png" alt="Volume Up">
+    </button>
+  </div>
+
+  <script>
+    function toggleMute() {
+      fetch("/toggle").then(r => r.text()).then(updateStatus);
+    }
+    function answerCall() {
+      fetch("/answer").then(r => r.text()).then(updateStatus);
+    }
+    function rejectCall() {
+      fetch("/reject").then(r => r.text()).then(updateStatus);
+    }
+    function toggleHold() {
+      fetch("/hold").then(r => r.text()).then(updateStatus);
+    }
+    function volumeUp() {
+      fetch("/volume?direction=up")
+        .then(r => r.text())
+        .then(updateStatus);
+    }
+    function volumeDown() {
+      fetch("/volume?direction=down")
+        .then(r => r.text())
+        .then(updateStatus);
+    }
+  </script>
+</body>
+</html>
