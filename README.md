@@ -56,3 +56,10 @@ This repository contains a set of scripts and tools for remotely controlling a Y
 - Python 3.8+
 - Electron (for overlay)
 - Basic shell environment
+
+## Setup
+
+- Configure the Yealink phone from their dashboard, enable remote control, setup syslog messages, and add servers IP as a trusted address
+- Enter the IP address of the phone into 'webServer.py', along with the username and password
+- Copy the file locations of the server and overlay directories into the 'phoneControls.sh' script
+- Launch the script, should start the overlay, and navigating to 'localhost:8080' should bring up the web dashboard.
