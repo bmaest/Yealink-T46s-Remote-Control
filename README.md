@@ -28,9 +28,10 @@ This repository contains a set of scripts and tools for remotely controlling a Y
 - `index.html`  
   Web page served by `webServer.py`. Displays call control buttons, transfer options, macros, and the call log.
 
+- `overlay.html`: UI for the overlay bar (bottom-left of screen)
+
 - `yealink-overlay/`  
   Contains files for the Electron overlay:
-  - `overlay.html`: UI for the overlay bar (bottom-left of screen)
   - `main.js`: Electron logic for rendering and controlling the overlay
   - `overlay.log`: Log file for overlay activity
   - `package.json`: Electron app configuration
@@ -53,13 +54,5 @@ This repository contains a set of scripts and tools for remotely controlling a Y
 ## 🛠️ Requirements
 
 - Python 3.8+
-- Flask (for `webServer.py`)
 - Electron (for overlay)
 - Basic shell environment
-
-## 📦 Setup
-
-1. Install Python dependencies:
-   ```bash
-   pip install flask
-
