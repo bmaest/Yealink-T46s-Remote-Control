@@ -39,11 +39,10 @@ This repository contains a set of scripts and tools for remotely controlling a Y
 - `resources/`  
   Folder containing all icons used in the web and overlay interfaces.
 
-- `cid_status.json`  
-  JSON file storing parsed call data from the syslog server.
-
-- `call_log.txt`  
-  Text log of all syslog messages received from the phone.
+- `syslog/`  
+  Contains files for the syslog server:
+  - `cid_status.json`: JSON file storing parsed call data from the syslog server
+  - `call_log.txt`: Text log of all syslog messages received from the phone
 
 - `webServer.log`  
   Log file for the web server's background activity.
