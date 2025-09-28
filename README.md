@@ -28,7 +28,7 @@ This repository contains a set of scripts and tools for remotely controlling a Y
 - `index.html`  
   Web page served by `webServer.py`. Displays call control buttons, transfer options, macros, and the call log.
 
-- `overlay.html`: UI for the overlay bar (bottom-left of screen)
+- `overlay.html`: UI for the overlay bar (bottom-right of screen)
 
 - `yealink-overlay/`  
   Contains files for the Electron overlay:
